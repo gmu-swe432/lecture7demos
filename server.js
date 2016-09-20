@@ -22,7 +22,7 @@ res.header("Access-Control-Allow-Origin", "*");
         sentiments.push(sentiment(item).score);
     res.json({ sentiments: sentiments });
 });
-var port = process.env.port || 4000;
+var port = process.env.PORT || 4000;
 
 app.listen(port, function () {
     console.log('Example app listening on port ' + port + '!');
