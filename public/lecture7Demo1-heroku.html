@@ -36,7 +36,7 @@
                 todoItems.push($(this).val());
             });
 
-            $.post("http://127.0.0.1:4000",  { todoItems: todoItems } )
+            $.post("https://pure-ridge-56952.herokuapp.com",  { todoItems: todoItems } )
                 .done(function(data)
                 {
                     $('#sentiments').text(data.sentiments);
