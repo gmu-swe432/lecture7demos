@@ -10,6 +10,8 @@
 <body>
 <div id="todoItems"></div>
 <button id="new">New item</button>
+<button id="save">Save</button>
+
 <br/><br/>
 <div id="sentiments"></div>
 
@@ -26,41 +28,53 @@
     };
     firebase.initializeApp(config);
 
-    firebase.database().ref('test').set({
-        test: "test",
+    var todosRef = firebase.database().ref('todos');
+
+
+    firebase.database().ref('users/tlatoza').set({
+        username: "Thomas LaToza",
+        email: "tlatoza@gmu.edu",
+        profile_picture : "profilePic.jpg"
     });
+
+
+
+    var nextIndex = 0;
+
+    todosRef.on('child_added', function(data) {
+        createItem(data.val().text, data.key);
+    });
+    todosRef.on('child_changed', function(data) {
+        $('div[data-index="' + data.key + '"] input').val(data.val().text);
+    });
+    todosRef.on('child_removed', function(data) {
+        $('div[data-index="' + data.key + '"]').remove();
+    });
+
 
     $('#new').click(function()
     {
-        $('#todoItems').append(
-            '<div class="todoItem"><input type="text" onchange="itemChanged(this)"/><button onclick="deleteItem(this.parentElement)">&#x2716;</button></div>'
-        );
+        todosRef.push({ 'text': ""});
     });
 
-    function deleteItem(divElem)
+    function createItem(value, key)
     {
-        divElem.parentElement.removeChild(divElem);
+        $('#todoItems').append(
+                '<div class="todoItem" data-index="' + key+ '"><input type="text" onchange="itemChanged(this)" value="'
+                + value + '"><button onclick="deleteItem(this.parentElement)">&#x2716;</button></div>'
+        );
+    }
+
+    function deleteItem(inputDiv)
+    {
+        todosRef.child(inputDiv.dataset.index).remove();
     }
 
     function itemChanged(inputElem)
     {
-        alert('hello world');
-        alert($( this ).val());
+        var index = inputElem.parentElement.dataset.index;
+        todosRef.child(inputElem.parentElement.dataset.index).set({ 'text': inputElem.value });
     }
-    $('#save').click(function()
-    {
-        var todoItems = [];
-        $('.todoItem input').each(function()
-        {
-            todoItems.push($(this).val());
-        });
-
-        $.post("http://127.0.0.1:4000",  { todoItems: todoItems } )
-            .done(function(data)
-            {
-                $('#sentiments').text(data.sentiments);
-            });
-    });
 </script>
 </body>
 </html>
