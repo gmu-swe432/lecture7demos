@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
+<body>
+    <div id="todoItems"></div>
+    <button id="new">New item</button>
+    <button id="save">Save</button>
+    <br/><br/>
+    <div id="sentiments"></div>
+    <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyCJARPlWFaebKH8yapXGNH29mDq8Uvk7fI",
+            authDomain: "swe432lecture7.firebaseapp.com",
+            databaseURL: "https://swe432lecture7.firebaseio.com",
+            storageBucket: "swe432lecture7.appspot.com",
+            messagingSenderId: "363336893703"
+        };
+        firebase.initializeApp(config);
+        var todosRef = firebase.database().ref('todos');
+
+    </script>
+
+    <script>
+        "use strict";
+
+        todosRef.on('child_added', function(data) {
+            createItem(data.val().text, data.key);
+        });
+
+        function createItem(value, key)
+        {
+            $('#todoItems').append(
+                    '<div class="todoItem" data-index="' + key+ '"><input type="text" onchange="itemChanged(this)" value="'
+                    + value + '"><button onclick="deleteItem(this.parentElement)">&#x2716;</button></div>'
+            );
+        }
+        function itemChanged(inputElem) {
+            todosRef.child(inputElem.parentElement.dataset.index).set({ 'text': inputElem.value });
+        }
+        $('#new').click(function()
+        {
+            todosRef.push({ 'text': ""});
+        });
+
+        function deleteItem(divElem)
+        {
+            divElem.parentElement.removeChild(divElem);
+        }
+
+        $('#save').click(function()
+        {
+            var todoItems = [];
+            $('.todoItem input').each(function()
+            {
+                todoItems.push($(this).val());
+            });
+            console.log(todoItems);
+            $.post("http://127.0.0.1:4000",  { todoItems: todoItems } )
+                .done(function(data)
+                {
+                    $('#sentiments').text(data.sentiments);
+                });
+            console.log("Done!")
+        });
+    </script>
+</body>
+</html>

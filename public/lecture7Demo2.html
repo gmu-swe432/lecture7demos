@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
+</head>
+<body>
+<div id="todoItems"></div>
+<button id="new">New item</button>
+<br/><br/>
+<div id="sentiments"></div>
+
+<script>
+    "use strict";
+
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyDPyU6iHOovjYYONyFxixI9NRYQKlxfR0A",
+        authDomain: "tdl-swe432-f16.firebaseapp.com",
+        databaseURL: "https://tdl-swe432-f16.firebaseio.com",
+        storageBucket: "tdl-swe432-f16.appspot.com",
+        messagingSenderId: "966620990032"
+    };
+    firebase.initializeApp(config);
+
+    firebase.database().ref('test').set({
+        test: "test",
+    });
+
+    $('#new').click(function()
+    {
+        $('#todoItems').append(
+            '<div class="todoItem"><input type="text" onchange="itemChanged(this)"/><button onclick="deleteItem(this.parentElement)">&#x2716;</button></div>'
+        );
+    });
+
+    function deleteItem(divElem)
+    {
+        divElem.parentElement.removeChild(divElem);
+    }
+
+    function itemChanged(inputElem)
+    {
+        alert('hello world');
+        alert($( this ).val());
+    }
+    $('#save').click(function()
+    {
+        var todoItems = [];
+        $('.todoItem input').each(function()
+        {
+            todoItems.push($(this).val());
+        });
+
+        $.post("http://127.0.0.1:4000",  { todoItems: todoItems } )
+            .done(function(data)
+            {
+                $('#sentiments').text(data.sentiments);
+            });
+    });
+</script>
+</body>
+</html>
