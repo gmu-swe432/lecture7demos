@@ -13,6 +13,9 @@ app.use(bodyParser.urlencoded({
 app.use(express.static('public'));
 
 app.post('/', function (req, res) {
+res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
     console.log(req.body.todoItems);
     var sentiments = [];
     for (var item of req.body.todoItems)
